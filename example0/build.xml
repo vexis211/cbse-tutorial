@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="target">
+
+	<property name="lib" value="lib" />
+
+	<property name="target.dir" value="target" />
+	<property name="target.lib" value="${target.dir}/${lib}" />
+	<property name="target.logs" value="${target.dir}/logs" />
+
+	<target name="target">
+		<jar destfile="${target.dir}/example0.jar">
+			<manifest>
+				<attribute name="Main-Class" value="example0.Main" />
+				<attribute name="Class-Path" value=". ${lib}/cloning-1.9.0.jar ${lib}/cz.cuni.mff.d3s.jdeeco.core-2.0.0.jar ${lib}/cz.cuni.mff.d3s.jdeeco.simulation-2.0.0.jar ${lib}/log4j-1.2.17.jar ${lib}/objenesis-1.2.jar ${lib}/org.eclipse.emf.common-2.9.0-v20130528-0742.jar ${lib}/org.eclipse.emf.ecore-2.9.0-v20130528-0742.jar ${lib}/org.eclipse.emf.ecore.xmi-2.9.0-v20130528-0742.jar"/>
+			</manifest>
+			<fileset dir="bin" />
+		</jar>
+		
+		<delete dir="${target.logs}" />
+		<mkdir dir="${target.logs}" />
+		
+		<delete dir="${target.lib}" />
+		<mkdir dir="${target.lib}" />
+		<copy todir="${target.lib}" verbose="yes" flatten="yes" failonerror="no">
+			<fileset dir="${lib}">
+				<include name="*.jar" />
+			</fileset>
+		</copy>
+	</target>
+</project>
