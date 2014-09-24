@@ -1,30 +1,104 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="target">
 
-	<property name="lib" value="lib" />
+	<!-- properties -->
+	<property name="class.main.name" value="example0.Main" />
+	
+	<property name="source.dir" value="src" />
+	<property name="lib.dir" value="lib" />
 
+	<property name="build.dir" value="bin" />
+	
 	<property name="target.dir" value="target" />
-	<property name="target.lib" value="${target.dir}/${lib}" />
+	<property name="target.lib" value="${target.dir}/${lib.dir}" />
 	<property name="target.logs" value="${target.dir}/logs" />
 
-	<target name="target">
-		<jar destfile="${target.dir}/example0.jar">
-			<manifest>
-				<attribute name="Main-Class" value="example0.Main" />
-				<attribute name="Class-Path" value=". ${lib}/cloning-1.9.0.jar ${lib}/cz.cuni.mff.d3s.jdeeco.core-2.0.0.jar ${lib}/cz.cuni.mff.d3s.jdeeco.simulation-2.0.0.jar ${lib}/log4j-1.2.17.jar ${lib}/objenesis-1.2.jar ${lib}/org.eclipse.emf.common-2.9.0-v20130528-0742.jar ${lib}/org.eclipse.emf.ecore-2.9.0-v20130528-0742.jar ${lib}/org.eclipse.emf.ecore.xmi-2.9.0-v20130528-0742.jar"/>
-			</manifest>
-			<fileset dir="bin" />
-		</jar>
+	<property name="jar.name" value="example0.jar" />
+	
+	<property name="debuglevel" value="source,lines,vars" />
+
+	<!-- pathes -->
+	<path id="classpath.libs">
+		<pathelement location="${lib.dir}/cloning-1.9.0.jar" />
+		<pathelement location="${lib.dir}/cz.cuni.mff.d3s.jdeeco.core-2.0.0.jar" />
+		<pathelement location="${lib.dir}/cz.cuni.mff.d3s.jdeeco.simulation-2.0.0.jar" />
+		<pathelement location="${lib.dir}/log4j-1.2.17.jar" />
+		<pathelement location="${lib.dir}/objenesis-1.2.jar" />
+		<pathelement location="${lib.dir}/org.eclipse.emf.common-2.9.0-v20130528-0742.jar" />
+		<pathelement location="${lib.dir}/org.eclipse.emf.ecore-2.9.0-v20130528-0742.jar" />
+		<pathelement location="${lib.dir}/org.eclipse.emf.ecore.xmi-2.9.0-v20130528-0742.jar" />
+	</path>
+
+	<path id="classpath.compile">
+		<pathelement location="${build.dir}" />
+		<path refid="classpath.libs" />
+	</path>
+	
+	<path id="classpath.run">
+		<pathelement location="." />
+		<path refid="classpath.libs" />
+	</path>
+
+
+	<!-- targets -->
+	<target name="clean">
+		<delete dir="${build.dir}" />
+	</target>
+
+	<target name="cleanall" depends="clean">
+		<delete dir="${target.dir}" />
+	</target>
+
+
+	<target name="init">
+		<mkdir dir="${build.dir}" />
+		<copy includeemptydirs="false" todir="${build.dir}">
+			<fileset dir="${source.dir}">
+				<exclude name="**/*.launch" />
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="build-subprojects" />
+
+	<target name="build-project" depends="init">
+		<echo message="${ant.project.name}: ${ant.file}" />
+		<javac debug="true" debuglevel="${debuglevel}" destdir="${build.dir}" includeantruntime="false">
+			<src path="${source.dir}" />
+			<classpath refid="classpath.compile" />
+		</javac>
+	</target>
+
+	<target name="build" depends="build-subprojects,build-project" />
+
+
+	<target name="target" depends="build">
+		<mkdir dir="${target.dir}" />
 		
+		<manifestclasspath property="classpath.manifest" jarfile="${target.dir}/${jar.name}">
+			<classpath refid="classpath.run"></classpath>
+		</manifestclasspath>
+		<jar destfile="${target.dir}/${jar.name}">
+			<manifest>
+				<attribute name="Main-Class" value="${class.main.name}" />
+				<attribute name="Class-Path" value="${classpath.manifest}" />
+			</manifest>
+			<fileset dir="${build.dir}" />
+		</jar>
+
 		<delete dir="${target.logs}" />
 		<mkdir dir="${target.logs}" />
-		
-		<delete dir="${target.lib}" />
+
 		<mkdir dir="${target.lib}" />
-		<copy todir="${target.lib}" verbose="yes" flatten="yes" failonerror="no">
-			<fileset dir="${lib}">
+		<copy todir="${target.lib}" verbose="true" flatten="true" failonerror="false">
+			<fileset dir="${lib.dir}">
 				<include name="*.jar" />
 			</fileset>
 		</copy>
+	</target>
+	
+	<target name="run" depends="target">
+		<java jar="${target.dir}/${jar.name}" fork="true" />
 	</target>
 </project>
