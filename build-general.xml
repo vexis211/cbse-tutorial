@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="target">
+
+	<!-- properties -->
+
+	<property name="source.dir" value="src" />
+	<property name="lib.dir" value="lib" />
+	<property name="logs.dir" value="logs" />
+
+	<property name="build.dir" value="bin" />
+	
+	<property name="target.dir" value="target" />
+	
+	<property name="target.lib" value="${target.dir}/${lib.dir}" />
+	<property name="target.logs" value="${target.dir}/${logs.dir}" />
+	
+	<property name="debuglevel" value="source,lines,vars" />
+
+	<!-- pathes -->
+
+	<path id="classpath.build">
+		<pathelement location="${build.dir}" />
+		<path refid="classpath.libs" />
+	</path>
+	
+	<path id="classpath.run">
+		<pathelement location="." />
+		<path refid="classpath.libs" />
+	</path>
+
+
+	<!-- targets -->
+	<target name="clean">
+		<delete dir="${build.dir}" />
+	</target>
+
+	<target name="cleanall" depends="clean">
+		<delete dir="${target.dir}" />
+	</target>
+
+
+	<target name="init">
+		<mkdir dir="${build.dir}" />
+		<copy includeemptydirs="false" todir="${build.dir}">
+			<fileset dir="${source.dir}">
+				<exclude name="**/*.launch" />
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="build-subprojects" />
+
+	<target name="build-project" depends="init">
+		<echo message="${ant.project.name}: ${ant.file}" />
+		<javac debug="true" debuglevel="${debuglevel}" destdir="${build.dir}" includeantruntime="false">
+			<src path="${source.dir}" />
+			<classpath refid="classpath.build" />
+		</javac>
+	</target>
+
+	<target name="build" depends="build-subprojects,build-project" />
+
+
+	<target name="target" depends="build">
+		<mkdir dir="${target.dir}" />
+		
+		<manifestclasspath property="classpath.manifest" jarfile="${target.dir}/${jar.name}">
+			<classpath refid="classpath.run"></classpath>
+		</manifestclasspath>
+		<jar destfile="${target.dir}/${jar.name}">
+			<manifest>
+				<attribute name="Main-Class" value="${class.main.name}" />
+				<attribute name="Class-Path" value="${classpath.manifest}" />
+			</manifest>
+			<fileset dir="${build.dir}" />
+		</jar>
+
+		<delete dir="${target.logs}" />
+		<mkdir dir="${target.logs}" />
+
+		<mkdir dir="${target.lib}" />
+		<copy todir="${target.lib}" verbose="true" flatten="true" failonerror="false">
+			<fileset dir="${lib.dir}">
+				<include name="*.jar" />
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="run" depends="target">
+		<java jar="${target.dir}/${jar.name}" fork="true" />
+	</target>
+</project>
