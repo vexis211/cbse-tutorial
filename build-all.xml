@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="target">
+	<target name="target">
+		<ant antfile="build.xml" dir="example0" />
+		<ant antfile="build.xml" dir="example1" />
+		<ant antfile="build.xml" dir="example2" />
+		<ant antfile="build.xml" dir="example3" />
+	</target>
+</project>
