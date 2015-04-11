@@ -1,7 +1,12 @@
 *.class
 
 /.metadata
+/Servers
 /example0/target
 /example1/target
 /example3/target
 /example2/target
+.settings/
+.classpath
+.project
+.springBeans
